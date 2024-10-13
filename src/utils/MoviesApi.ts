@@ -26,8 +26,6 @@ class MoviesApi {
   }
 }
 
-console.log(process.env.REACT_APP_API_TOKEN)
-
 export const moviesApi = new MoviesApi({
   baseUrl: 'https://api.themoviedb.org/3/search/movie?query=return&include_adult=false&language=en-US&page=1',
   headers: {
