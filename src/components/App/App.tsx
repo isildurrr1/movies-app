@@ -1,7 +1,7 @@
-import MoviesList from '../MoviesList/MoviesList'
-import './App.sass'
+import { MoviesList } from '../MoviesList/MoviesList'
+import './app/app.sass'
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <div className="app">
       <MoviesList />
