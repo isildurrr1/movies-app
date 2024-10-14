@@ -20,3 +20,12 @@ export interface Movie {
 export interface CardProps {
   data: Movie
 }
+
+export interface MoviesListState {
+  movies: Movie[]
+  error: {
+    status: boolean
+    name?: string
+    description?: string
+  }
+}
