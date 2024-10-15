@@ -28,4 +28,5 @@ export interface MoviesListState {
     name?: string
     description?: string
   }
+  loader: boolean
 }
