@@ -5,8 +5,21 @@ export interface MoviesApiOptions {
   }
 }
 
+interface Error {
+  status: boolean
+  name?: string
+  description?: string
+}
+
+interface Pagination {
+  page: number
+  totalResults: number
+}
+
 export interface MoviesListProps {
-  moviesArray: Movie[]
+  movies: Movie[]
+  loader: boolean
+  error: Error
 }
 
 export interface Movie {
@@ -21,12 +34,10 @@ export interface CardProps {
   data: Movie
 }
 
-export interface MoviesListState {
+export interface AppState {
+  input: string
+  pagination: Pagination
   movies: Movie[]
-  error: {
-    status: boolean
-    name?: string
-    description?: string
-  }
   loader: boolean
+  error: Error
 }

@@ -17,17 +17,17 @@ class MoviesApi {
     return Promise.reject(`Ошибка: ${res.status}`)
   }
 
-  async getMovies() {
-    const response = await fetch(`${this.baseUrl}`, {
+  async search(str: string) {
+    const response = await fetch(`${this.baseUrl}search/movie?query=${str}&include_adult=false&language=en-US&page=1`, {
       method: 'GET',
       headers: this.headers,
     }).then(this._checkResponse)
-    return response.results
+    return response
   }
 }
 
 export const moviesApi = new MoviesApi({
-  baseUrl: 'https://api.themoviedb.org/3/search/movie?query=return&include_adult=false&language=en-US&page=1',
+  baseUrl: 'https://api.themoviedb.org/3/',
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
