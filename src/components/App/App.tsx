@@ -11,7 +11,7 @@ export default class App extends Component {
   state: AppState = {
     movies: [],
     pagination: {
-      page: 0,
+      page: 1,
       totalResults: 0,
     },
     input: '',
@@ -23,8 +23,7 @@ export default class App extends Component {
 
   // Создаем дебоунс-функцию для поиска фильмов
   debouncedGetMovies = debounce(() => {
-    const { input } = this.state
-
+    const { input, pagination } = this.state
     if (input.trim().length === 0) {
       this.setState({ movies: [] }) // Очистка списка фильмов
       return
@@ -32,9 +31,10 @@ export default class App extends Component {
 
     this.setState({ loader: true })
     moviesApi
-      .search(input)
+      .search(input, pagination.page)
       .then((res) => {
-        this.setState({ movies: res.results, pagination: { page: res.page, totalResults: res.total_results } })
+        console.log(this.state.pagination)
+        this.setState({ movies: res.results, pagination: { page: pagination.page, totalResults: res.total_results } })
       })
       .catch((error) => {
         this.setState({
@@ -46,13 +46,35 @@ export default class App extends Component {
       })
   }, 800)
 
+  handlePagination = (page: number) => {
+    this.setState(
+      (prevState: Readonly<AppState>) => ({ pagination: { ...prevState.pagination, page } }),
+      this.debouncedGetMovies
+    )
+  }
+
+  updateState = (newState: Partial<AppState>) => {
+    this.setState((prevState) => ({ ...prevState, ...newState }), this.debouncedGetMovies)
+  }
+
   getString = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
-    this.setState({ input: inputValue }, this.debouncedGetMovies)
+    if (inputValue.trim().length === 0) {
+      this.updateState({
+        input: inputValue,
+        movies: [],
+        pagination: { page: 1, totalResults: 0 },
+      })
+    } else {
+      this.updateState({
+        input: inputValue,
+        pagination: { ...this.state.pagination, page: 1 },
+      })
+    }
   }
 
   render() {
-    const { movies, loader, error } = this.state
+    const { movies, loader, error, pagination } = this.state
 
     return (
       <div className="app">
@@ -66,26 +88,28 @@ export default class App extends Component {
                 <>
                   <Input placeholder="Type to search..." onChange={this.getString} disabled={loader} />
                   <MoviesList movies={movies} loader={loader} error={error} />
-                  <ConfigProvider
-                    theme={{
-                      components: {
-                        Pagination: {
-                          itemActiveBg: '#1890FF',
-                          colorPrimary: 'white',
-                          colorPrimaryHover: 'white',
+                  {movies.length > 0 && (
+                    <ConfigProvider
+                      theme={{
+                        components: {
+                          Pagination: {
+                            itemActiveBg: '#1890FF',
+                            colorPrimary: 'white',
+                            colorPrimaryHover: 'white',
+                          },
                         },
-                      },
-                    }}
-                  >
-                    <Pagination
-                      align="center"
-                      defaultCurrent={this.state.pagination.page}
-                      pageSize={20}
-                      total={this.state.pagination.totalResults}
-                      showSizeChanger={false}
-                      onChange={(page) => console.log(page)}
-                    />
-                  </ConfigProvider>
+                      }}
+                    >
+                      <Pagination
+                        align="center"
+                        current={pagination.page}
+                        pageSize={20}
+                        total={pagination.totalResults}
+                        showSizeChanger={false}
+                        onChange={this.handlePagination}
+                      />
+                    </ConfigProvider>
+                  )}
                 </>
               ),
             },

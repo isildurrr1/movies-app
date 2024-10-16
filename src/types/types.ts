@@ -11,7 +11,7 @@ interface Error {
   description?: string
 }
 
-interface Pagination {
+export interface Pagination {
   page: number
   totalResults: number
 }
