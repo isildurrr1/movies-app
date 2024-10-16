@@ -29,12 +29,20 @@ export default class App extends Component {
       return
     }
 
-    this.setState({ loader: true })
+    this.setState({ loader: true, error: { status: false } })
     moviesApi
       .search(input, pagination.page)
       .then((res) => {
-        console.log(this.state.pagination)
-        this.setState({ movies: res.results, pagination: { page: pagination.page, totalResults: res.total_results } })
+        if (res.results.length !== 0) {
+          this.setState({
+            movies: res.results,
+            pagination: { page: pagination.page, totalResults: res.total_results },
+          })
+        } else {
+          this.setState({
+            error: { status: true, name: 'Not found', description: 'Movies matching your request - not found. : (' },
+          })
+        }
       })
       .catch((error) => {
         this.setState({
@@ -53,23 +61,26 @@ export default class App extends Component {
     )
   }
 
-  updateState = (newState: Partial<AppState>) => {
-    this.setState((prevState) => ({ ...prevState, ...newState }), this.debouncedGetMovies)
-  }
-
   getString = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
     if (inputValue.trim().length === 0) {
-      this.updateState({
-        input: inputValue,
-        movies: [],
-        pagination: { page: 1, totalResults: 0 },
-      })
+      this.setState(
+        {
+          input: inputValue,
+          movies: [],
+          pagination: { page: 1, totalResults: 0 },
+          error: { status: false },
+        },
+        this.debouncedGetMovies
+      )
     } else {
-      this.updateState({
-        input: inputValue,
-        pagination: { ...this.state.pagination, page: 1 },
-      })
+      this.setState(
+        {
+          input: inputValue,
+          pagination: { ...this.state.pagination, page: 1 },
+        },
+        this.debouncedGetMovies
+      )
     }
   }
 
