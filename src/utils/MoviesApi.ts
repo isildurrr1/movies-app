@@ -17,9 +17,26 @@ class MoviesApi {
     return Promise.reject(`Ошибка: ${res.status}`)
   }
 
-  async search(str: string, page: number) {
-    const response = await fetch(
-      `${this.baseUrl}search/movie?query=${str}&include_adult=false&language=en-US&page=${page}`,
+  startGuestSession() {
+    const response = fetch(`${this.baseUrl}authentication/guest_session/new?api_key=${process.env.REACT_APP_API_KEY}`, {
+      method: 'GET',
+      headers: this.headers,
+    }).then(this._checkResponse)
+    return response
+  }
+
+  getGenres() {
+    const response = fetch(`${this.baseUrl}genre/movie/list?api_key=${process.env.REACT_APP_API_KEY}`, {
+      method: 'GET',
+      headers: this.headers,
+    }).then(this._checkResponse)
+    return response
+  }
+
+  search(str: string, page: number, guest_id: string) {
+    console.log(guest_id)
+    const response = fetch(
+      `${this.baseUrl}search/movie?query=${str}&include_adult=false&language=en-US&page=${page}&api_key=${process.env.REACT_APP_API_KEY}`,
       {
         method: 'GET',
         headers: this.headers,
@@ -33,6 +50,5 @@ export const moviesApi = new MoviesApi({
   baseUrl: 'https://api.themoviedb.org/3/',
   headers: {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
   },
 })

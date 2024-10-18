@@ -28,6 +28,8 @@ export interface Movie {
   release_date: string
   overview: string
   poster_path: string
+  vote_average: number
+  genre_ids: number[]
 }
 
 export interface CardProps {
@@ -40,4 +42,5 @@ export interface AppState {
   movies: Movie[]
   loader: boolean
   error: Error
+  guestId: string
 }

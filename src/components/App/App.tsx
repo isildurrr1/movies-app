@@ -19,11 +19,12 @@ export default class App extends Component {
     error: {
       status: false,
     },
+    guestId: '',
   }
 
   // Создаем дебоунс-функцию для поиска фильмов
   debouncedGetMovies = debounce(() => {
-    const { input, pagination } = this.state
+    const { input, pagination, guestId } = this.state
     if (input.trim().length === 0) {
       this.setState({ movies: [] }) // Очистка списка фильмов
       return
@@ -31,7 +32,7 @@ export default class App extends Component {
 
     this.setState({ loader: true, error: { status: false } })
     moviesApi
-      .search(input, pagination.page)
+      .search(input, pagination.page, guestId)
       .then((res) => {
         if (res.results.length !== 0) {
           this.setState({
@@ -82,6 +83,17 @@ export default class App extends Component {
         this.debouncedGetMovies
       )
     }
+  }
+
+  componentDidMount(): void {
+    moviesApi.startGuestSession().then((res) => {
+      this.setState(() => {
+        return { guestId: res.guest_session_id }
+      })
+    })
+    moviesApi.getGenres().then((res) => {
+      console.log(res.genres)
+    })
   }
 
   render() {
