@@ -12,7 +12,7 @@ export default class App extends Component {
   state: AppState = {
     movies: [],
     genres: [],
-    pagination: {
+    searchPagination: {
       page: 1,
       totalResults: 0,
     },
@@ -21,12 +21,16 @@ export default class App extends Component {
     error: {
       status: false,
     },
-    guestId: '',
+    ratedMovies: [],
+    ratePagination: {
+      page: 1,
+      totalResults: 0,
+    },
   }
 
   // Создаем дебоунс-функцию для поиска фильмов
   debouncedGetMovies = debounce(() => {
-    const { input, pagination, guestId } = this.state
+    const { input, searchPagination } = this.state
     if (input.trim().length === 0) {
       this.setState({ movies: [] }) // Очистка списка фильмов
       return
@@ -34,12 +38,12 @@ export default class App extends Component {
 
     this.setState({ loader: true, error: { status: false } })
     moviesApi
-      .search(input, pagination.page, guestId)
+      .search(input, searchPagination.page)
       .then((res) => {
         if (res.results.length !== 0) {
           this.setState({
             movies: res.results,
-            pagination: { page: pagination.page, totalResults: res.total_results },
+            searchPagination: { page: searchPagination.page, totalResults: res.total_results },
           })
         } else {
           this.setState({
@@ -59,7 +63,7 @@ export default class App extends Component {
 
   handlePagination = (page: number) => {
     this.setState(
-      (prevState: Readonly<AppState>) => ({ pagination: { ...prevState.pagination, page } }),
+      (prevState: Readonly<AppState>) => ({ searchPagination: { ...prevState.searchPagination, page } }),
       this.debouncedGetMovies
     )
   }
@@ -71,7 +75,7 @@ export default class App extends Component {
         {
           input: inputValue,
           movies: [],
-          pagination: { page: 1, totalResults: 0 },
+          searchPagination: { page: 1, totalResults: 0 },
           error: { status: false },
         },
         this.debouncedGetMovies
@@ -80,19 +84,32 @@ export default class App extends Component {
       this.setState(
         {
           input: inputValue,
-          pagination: { ...this.state.pagination, page: 1 },
+          searchPagination: { ...this.state.searchPagination, page: 1 },
         },
         this.debouncedGetMovies
       )
     }
   }
 
-  componentDidMount(): void {
-    moviesApi.startGuestSession().then((res) => {
-      this.setState(() => {
-        return { guestId: res.guest_session_id }
-      })
+  rateMovie = (rate: number, id: number) => {
+    moviesApi.addRate(rate, id).then(() => {
+      moviesApi
+        .getRatedMovies(1)
+        .then((res) => {
+          console.log(res)
+          this.setState(() => {
+            return { ratedMovies: res.results }
+          })
+        })
+        .catch(() => {
+          this.setState({
+            error: { status: true, name: 'Rating Error', description: 'The rating is not counted. Try again. : (' },
+          })
+        })
     })
+  }
+
+  componentDidMount(): void {
     moviesApi.getGenres().then((res) => {
       this.setState(() => {
         return { genres: res.genres }
@@ -101,13 +118,14 @@ export default class App extends Component {
   }
 
   render() {
-    const { movies, loader, error, pagination } = this.state
+    const { movies, loader, ratedMovies, error, searchPagination } = this.state
 
     return (
       <GenresProvider value={this.state.genres}>
         <div className="app">
           <Tabs
             centered
+            destroyInactiveTabPane
             items={[
               {
                 label: 'Search',
@@ -115,7 +133,7 @@ export default class App extends Component {
                 children: (
                   <>
                     <Input placeholder="Type to search..." onChange={this.getString} disabled={loader} />
-                    <MoviesList movies={movies} loader={loader} error={error} />
+                    <MoviesList movies={movies} rateMovie={this.rateMovie} loader={loader} error={error} />
                     {movies.length > 0 && (
                       <ConfigProvider
                         theme={{
@@ -130,9 +148,9 @@ export default class App extends Component {
                       >
                         <Pagination
                           align="center"
-                          current={pagination.page}
+                          current={searchPagination.page}
                           pageSize={20}
-                          total={pagination.totalResults}
+                          total={searchPagination.totalResults}
                           showSizeChanger={false}
                           onChange={this.handlePagination}
                         />
@@ -141,7 +159,20 @@ export default class App extends Component {
                   </>
                 ),
               },
-              { label: 'Rated', key: '2' },
+              {
+                label: 'Rated',
+                key: '2',
+                children: (
+                  <>
+                    <MoviesList
+                      movies={ratedMovies}
+                      rateMovie={this.rateMovie}
+                      loader={loader}
+                      error={error}
+                    ></MoviesList>
+                  </>
+                ),
+              },
             ]}
           />
         </div>

@@ -8,7 +8,7 @@ import { MoviesListProps } from '../../types/types'
 
 export class MoviesList extends Component<MoviesListProps> {
   render() {
-    const { movies, loader, error } = this.props
+    const { movies, rateMovie, loader, error } = this.props
     return (
       <div className="movies-list">
         <Online>
@@ -25,7 +25,7 @@ export class MoviesList extends Component<MoviesListProps> {
           ) : (
             <>
               {movies.map((element) => (
-                <Card key={element.id} data={element} /> // данные пришли и рендерим карточки
+                <Card key={element.id} data={element} rateMovie={rateMovie} /> // данные пришли и рендерим карточки
               ))}
             </>
           )}

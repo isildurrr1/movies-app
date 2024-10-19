@@ -20,6 +20,7 @@ export interface MoviesListProps {
   movies: Movie[]
   loader: boolean
   error: Error
+  rateMovie: (arg0: number, arg1: number) => void
 }
 
 export interface Movie {
@@ -30,20 +31,23 @@ export interface Movie {
   poster_path: string
   vote_average: number
   genre_ids: number[]
+  rating: number
 }
 
 export interface CardProps {
   data: Movie
+  rateMovie: (arg0: number, arg1: number) => void
 }
 
 export interface AppState {
   input: string
-  pagination: Pagination
+  searchPagination: Pagination
   movies: Movie[]
   genres: []
   loader: boolean
   error: Error
-  guestId: string
+  ratedMovies: Movie[]
+  ratePagination: Pagination
 }
 
 export interface Genre {

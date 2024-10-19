@@ -1,13 +1,12 @@
 import { format, parseISO } from 'date-fns'
 import { Rate } from 'antd'
 
+import { GenresConsumer } from '../../context/GernesContext'
 import { CardProps, Genre } from '../../types/types'
 import { ellipsedText } from '../../utils/EllipsedText'
-import { GenresConsumer } from '../../context/GernesContext'
-
 import './card/card.sass'
 
-const Card: React.FC<CardProps> = ({ data }) => {
+const Card: React.FC<CardProps> = ({ data, rateMovie }) => {
   const setColor = (rating: number) => {
     if (rating < 3) {
       return '#E90000'
@@ -20,6 +19,9 @@ const Card: React.FC<CardProps> = ({ data }) => {
     }
   }
 
+  const handleRating = (rate: number, id: number) => {
+    rateMovie(rate, id)
+  }
   return (
     <GenresConsumer>
       {(genres: Genre[]) => {
@@ -54,7 +56,13 @@ const Card: React.FC<CardProps> = ({ data }) => {
                 })}
               </div>
               <p className="card__description">{ellipsedText(data.overview, data.genre_ids.length)}</p>
-              <Rate allowHalf defaultValue={2.5} count={10} style={{ marginTop: 'auto', fontSize: '16px' }} />
+              <Rate
+                allowHalf
+                defaultValue={data.rating}
+                count={10}
+                style={{ marginTop: 'auto', fontSize: '16px' }}
+                onChange={(rate) => handleRating(rate, data.id)}
+              />
             </div>
           </div>
         )
