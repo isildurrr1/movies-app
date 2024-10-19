@@ -40,7 +40,13 @@ export interface AppState {
   input: string
   pagination: Pagination
   movies: Movie[]
+  genres: []
   loader: boolean
   error: Error
   guestId: string
+}
+
+export interface Genre {
+  id: number
+  name: string
 }

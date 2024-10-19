@@ -2,14 +2,16 @@ import { ConfigProvider, Input, Pagination, Tabs } from 'antd'
 import { ChangeEvent, Component } from 'react'
 import { debounce } from 'lodash'
 
-import { MoviesList } from '../MoviesList/MoviesList'
 import './app/app.sass'
+import { MoviesList } from '../MoviesList/MoviesList'
 import { AppState } from '../../types/types'
 import { moviesApi } from '../../utils/MoviesApi'
+import { GenresProvider } from '../../context/GernesContext'
 
 export default class App extends Component {
   state: AppState = {
     movies: [],
+    genres: [],
     pagination: {
       page: 1,
       totalResults: 0,
@@ -92,7 +94,9 @@ export default class App extends Component {
       })
     })
     moviesApi.getGenres().then((res) => {
-      console.log(res.genres)
+      this.setState(() => {
+        return { genres: res.genres }
+      })
     })
   }
 
@@ -100,46 +104,48 @@ export default class App extends Component {
     const { movies, loader, error, pagination } = this.state
 
     return (
-      <div className="app">
-        <Tabs
-          centered
-          items={[
-            {
-              label: 'Search',
-              key: '1',
-              children: (
-                <>
-                  <Input placeholder="Type to search..." onChange={this.getString} disabled={loader} />
-                  <MoviesList movies={movies} loader={loader} error={error} />
-                  {movies.length > 0 && (
-                    <ConfigProvider
-                      theme={{
-                        components: {
-                          Pagination: {
-                            itemActiveBg: '#1890FF',
-                            colorPrimary: 'white',
-                            colorPrimaryHover: 'white',
+      <GenresProvider value={this.state.genres}>
+        <div className="app">
+          <Tabs
+            centered
+            items={[
+              {
+                label: 'Search',
+                key: '1',
+                children: (
+                  <>
+                    <Input placeholder="Type to search..." onChange={this.getString} disabled={loader} />
+                    <MoviesList movies={movies} loader={loader} error={error} />
+                    {movies.length > 0 && (
+                      <ConfigProvider
+                        theme={{
+                          components: {
+                            Pagination: {
+                              itemActiveBg: '#1890FF',
+                              colorPrimary: 'white',
+                              colorPrimaryHover: 'white',
+                            },
                           },
-                        },
-                      }}
-                    >
-                      <Pagination
-                        align="center"
-                        current={pagination.page}
-                        pageSize={20}
-                        total={pagination.totalResults}
-                        showSizeChanger={false}
-                        onChange={this.handlePagination}
-                      />
-                    </ConfigProvider>
-                  )}
-                </>
-              ),
-            },
-            { label: 'Rated', key: '2' },
-          ]}
-        />
-      </div>
+                        }}
+                      >
+                        <Pagination
+                          align="center"
+                          current={pagination.page}
+                          pageSize={20}
+                          total={pagination.totalResults}
+                          showSizeChanger={false}
+                          onChange={this.handlePagination}
+                        />
+                      </ConfigProvider>
+                    )}
+                  </>
+                ),
+              },
+              { label: 'Rated', key: '2' },
+            ]}
+          />
+        </div>
+      </GenresProvider>
     )
   }
 }
