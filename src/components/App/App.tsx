@@ -28,11 +28,10 @@ export default class App extends Component {
     },
   }
 
-  // Создаем дебоунс-функцию для поиска фильмов
   debouncedGetMovies = debounce(() => {
     const { input, searchPagination } = this.state
     if (input.trim().length === 0) {
-      this.setState({ movies: [] }) // Очистка списка фильмов
+      this.setState({ movies: [] })
       return
     }
 
@@ -44,6 +43,7 @@ export default class App extends Component {
           this.setState({
             movies: res.results,
             searchPagination: { page: searchPagination.page, totalResults: res.total_results },
+            error: { status: false },
           })
         } else {
           this.setState({
@@ -61,10 +61,17 @@ export default class App extends Component {
       })
   }, 800)
 
-  handlePagination = (page: number) => {
+  handleSearchPagination = (page: number) => {
     this.setState(
       (prevState: Readonly<AppState>) => ({ searchPagination: { ...prevState.searchPagination, page } }),
       this.debouncedGetMovies
+    )
+  }
+
+  handleRatePagination = (page: number) => {
+    this.setState(
+      (prevState: Readonly<AppState>) => ({ ratePagination: { ...prevState.ratePagination, page } }),
+      this.getRatedMovies
     )
   }
 
@@ -91,22 +98,38 @@ export default class App extends Component {
     }
   }
 
+  getRatedMovies = (): void => {
+    const { ratePagination } = this.state
+    moviesApi
+      .getRatedMovies(ratePagination.page)
+      .then((res) => {
+        this.setState(() => {
+          return {
+            ratedMovies: res.results,
+            ratePagination: { page: ratePagination.page, totalResults: res.total_results },
+          }
+        })
+      })
+      .catch(() => {
+        this.setState({
+          error: { status: true, name: 'Rating Error', description: 'The rating is not counted. Try again. : (' },
+        })
+      })
+  }
+
   rateMovie = (rate: number, id: number) => {
     moviesApi.addRate(rate, id).then(() => {
-      moviesApi
-        .getRatedMovies(1)
-        .then((res) => {
-          console.log(res)
-          this.setState(() => {
-            return { ratedMovies: res.results }
-          })
-        })
-        .catch(() => {
-          this.setState({
-            error: { status: true, name: 'Rating Error', description: 'The rating is not counted. Try again. : (' },
-          })
-        })
+      this.getRatedMovies()
     })
+  }
+
+  handleTab = (tabNum: string) => {
+    this.setState(() => {
+      return { error: { status: false } }
+    })
+    if (tabNum === '2') {
+      this.getRatedMovies()
+    }
   }
 
   componentDidMount(): void {
@@ -118,12 +141,13 @@ export default class App extends Component {
   }
 
   render() {
-    const { movies, loader, ratedMovies, error, searchPagination } = this.state
+    const { movies, loader, ratedMovies, error, searchPagination, ratePagination } = this.state
 
     return (
       <GenresProvider value={this.state.genres}>
         <div className="app">
           <Tabs
+            onChange={(e) => this.handleTab(e)}
             centered
             destroyInactiveTabPane
             items={[
@@ -152,7 +176,7 @@ export default class App extends Component {
                           pageSize={20}
                           total={searchPagination.totalResults}
                           showSizeChanger={false}
-                          onChange={this.handlePagination}
+                          onChange={this.handleSearchPagination}
                         />
                       </ConfigProvider>
                     )}
@@ -170,6 +194,28 @@ export default class App extends Component {
                       loader={loader}
                       error={error}
                     ></MoviesList>
+                    {ratedMovies.length > 0 && (
+                      <ConfigProvider
+                        theme={{
+                          components: {
+                            Pagination: {
+                              itemActiveBg: '#1890FF',
+                              colorPrimary: 'white',
+                              colorPrimaryHover: 'white',
+                            },
+                          },
+                        }}
+                      >
+                        <Pagination
+                          align="center"
+                          current={ratePagination.page}
+                          pageSize={20}
+                          total={ratePagination.totalResults}
+                          showSizeChanger={false}
+                          onChange={this.handleRatePagination}
+                        />
+                      </ConfigProvider>
+                    )}
                   </>
                 ),
               },

@@ -38,7 +38,6 @@ class MoviesApi {
   }
 
   search(str: string, page: number) {
-    console.log(this.guestId)
     const response = fetch(
       `${this.baseUrl}search/movie?query=${str}&include_adult=false&language=en-US&page=${page}&api_key=${process.env.REACT_APP_API_KEY}`,
       {
@@ -62,9 +61,8 @@ class MoviesApi {
   }
 
   getRatedMovies(page: number) {
-    console.log(page)
     const responce = fetch(
-      `${this.baseUrl}guest_session/${this.guestId}/rated/movies?api_key=${process.env.REACT_APP_API_KEY}`,
+      `${this.baseUrl}guest_session/${this.guestId}/rated/movies?api_key=${process.env.REACT_APP_API_KEY}&page=${page}`,
       {
         method: 'GET',
         headers: this.headers,
