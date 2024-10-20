@@ -3,6 +3,7 @@ import { ChangeEvent, Component } from 'react'
 import { debounce } from 'lodash'
 
 import './app/app.sass'
+import './app/__input/app__input.sass'
 import { MoviesList } from '../MoviesList/MoviesList'
 import { AppState } from '../../types/types'
 import { moviesApi } from '../../utils/MoviesApi'
@@ -147,6 +148,7 @@ export default class App extends Component {
       <GenresProvider value={this.state.genres}>
         <div className="app">
           <Tabs
+            className="app__tabs"
             onChange={(e) => this.handleTab(e)}
             centered
             destroyInactiveTabPane
@@ -156,7 +158,7 @@ export default class App extends Component {
                 key: '1',
                 children: (
                   <>
-                    <Input placeholder="Type to search..." onChange={this.getString} disabled={loader} />
+                    <Input className="app__input" placeholder="Type to search..." onChange={this.getString} autoFocus />
                     <MoviesList movies={movies} rateMovie={this.rateMovie} loader={loader} error={error} />
                     {movies.length > 0 && (
                       <ConfigProvider

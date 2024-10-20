@@ -1,6 +1,19 @@
 .card__description
-  margin: 0
+  margin: 0 0 0 20px
+  letter-spacing: 0.36px
   font-size: 12px
   width: 228px
-  line-height: 22px
+  line-height: 21.8px
   max-height: 129px
+
+@media screen and (max-width: 509px)
+  .card__description
+    padding: 0
+    grid-column-start: 1
+    grid-column-end: 3
+    width: 367px
+    margin: 10px 0 0 10px
+
+@media screen and (max-width: 420px)
+  .card__description
+    width: 90%

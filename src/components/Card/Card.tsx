@@ -5,6 +5,7 @@ import { GenresConsumer } from '../../context/GernesContext'
 import { CardProps, Genre } from '../../types/types'
 import { ellipsedText } from '../../utils/EllipsedText'
 import './card/card.sass'
+import './card/__stars/card__stars.sass'
 
 const Card: React.FC<CardProps> = ({ data, rateMovie }) => {
   const setColor = (rating: number) => {
@@ -55,15 +56,15 @@ const Card: React.FC<CardProps> = ({ data, rateMovie }) => {
                   }
                 })}
               </div>
-              <p className="card__description">{ellipsedText(data.overview, data.genre_ids.length)}</p>
-              <Rate
-                allowHalf
-                defaultValue={data.rating}
-                count={10}
-                style={{ marginTop: 'auto', fontSize: '16px' }}
-                onChange={(rate) => handleRating(rate, data.id)}
-              />
             </div>
+            <p className="card__description">{ellipsedText(data.overview, data.genre_ids.length)}</p>
+            <Rate
+              allowHalf
+              defaultValue={data.rating}
+              count={10}
+              className="card__stars"
+              onChange={(rate) => handleRating(rate, data.id)}
+            />
           </div>
         )
       }}
