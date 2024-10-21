@@ -39,13 +39,13 @@ const Card: React.FC<CardProps> = ({ data, ratedMovies, rateMovie }) => {
         return (
           <div className="card">
             <img
+              alt="picture"
               className="card__cover"
               src={
                 data.poster_path === null
                   ? './images/placeholder.png'
                   : `https://image.tmdb.org/t/p/w500${data.poster_path}`
               }
-              alt="picture"
             />
             <div className="card__info">
               <h2 className="card__title">{data.title}</h2>
@@ -64,6 +64,7 @@ const Card: React.FC<CardProps> = ({ data, ratedMovies, rateMovie }) => {
                       </div>
                     )
                   }
+                  return <></>
                 })}
               </div>
             </div>

@@ -196,12 +196,7 @@ export default class App extends Component {
                 key: '2',
                 children: (
                   <>
-                    <MoviesList
-                      movies={ratedMovies}
-                      rateMovie={this.rateMovie}
-                      loader={loader}
-                      error={error}
-                    ></MoviesList>
+                    <MoviesList movies={ratedMovies} rateMovie={this.rateMovie} loader={loader} error={error} />
                     {ratedMovies.length > 0 && (
                       <ConfigProvider
                         theme={{
