@@ -21,6 +21,7 @@ export interface MoviesListProps {
   loader: boolean
   error: Error
   rateMovie: (arg0: number, arg1: number) => void
+  ratedMovies?: Movie[]
 }
 
 export interface Movie {
@@ -36,6 +37,7 @@ export interface Movie {
 
 export interface CardProps {
   data: Movie
+  ratedMovies?: Movie[]
   rateMovie: (arg0: number, arg1: number) => void
 }
 

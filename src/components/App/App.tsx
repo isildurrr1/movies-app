@@ -159,7 +159,13 @@ export default class App extends Component {
                 children: (
                   <>
                     <Input className="app__input" placeholder="Type to search..." onChange={this.getString} autoFocus />
-                    <MoviesList movies={movies} rateMovie={this.rateMovie} loader={loader} error={error} />
+                    <MoviesList
+                      movies={movies}
+                      ratedMovies={ratedMovies}
+                      rateMovie={this.rateMovie}
+                      loader={loader}
+                      error={error}
+                    />
                     {movies.length > 0 && (
                       <ConfigProvider
                         theme={{

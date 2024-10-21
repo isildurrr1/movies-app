@@ -10,7 +10,7 @@ import { MoviesListProps } from '../../types/types'
 
 export class MoviesList extends Component<MoviesListProps> {
   render() {
-    const { movies, rateMovie, loader, error } = this.props
+    const { movies, ratedMovies, rateMovie, loader, error } = this.props
     return (
       <div className="movies-list">
         <Online>
@@ -27,7 +27,7 @@ export class MoviesList extends Component<MoviesListProps> {
           ) : (
             <>
               {movies.map((element) => (
-                <Card key={element.id} data={element} rateMovie={rateMovie} />
+                <Card key={element.id} data={element} rateMovie={rateMovie} ratedMovies={ratedMovies} />
               ))}
             </>
           )}

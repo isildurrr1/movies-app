@@ -7,7 +7,7 @@ import { ellipsedText } from '../../utils/EllipsedText'
 import './card/card.sass'
 import './card/__stars/card__stars.sass'
 
-const Card: React.FC<CardProps> = ({ data, rateMovie }) => {
+const Card: React.FC<CardProps> = ({ data, ratedMovies, rateMovie }) => {
   const setColor = (rating: number) => {
     if (rating < 3) {
       return '#E90000'
@@ -18,6 +18,16 @@ const Card: React.FC<CardProps> = ({ data, rateMovie }) => {
     } else {
       return '#66E900'
     }
+  }
+
+  const checkRating = (id: number) => {
+    let result = 0
+    ratedMovies?.forEach((element) => {
+      if (element.id === id) {
+        result = element.rating
+      }
+    })
+    return result
   }
 
   const handleRating = (rate: number, id: number) => {
@@ -60,7 +70,8 @@ const Card: React.FC<CardProps> = ({ data, rateMovie }) => {
             <p className="card__description">{ellipsedText(data.overview, data.genre_ids.length)}</p>
             <Rate
               allowHalf
-              defaultValue={data.rating}
+              defaultValue={checkRating(data.id)}
+              value={data.rating}
               count={10}
               className="card__stars"
               onChange={(rate) => handleRating(rate, data.id)}
